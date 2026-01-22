@@ -70,4 +70,5 @@ reference for function pointers.
 ---
 
 Enough introduction. Now you need to implement a dynamic dispatch logic to
-practice OOP logic - [with what you have already known](./milestone-1.md).
+practice OOP logic -
+[with what you have already known](./00_traditional-approach/README.md).

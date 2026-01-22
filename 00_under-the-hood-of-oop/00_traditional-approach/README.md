@@ -79,3 +79,9 @@ types:
 
 After completing this, you'll appreciate how function pointers can simplify
 this pattern!
+
+---
+
+Implement logic for this task yourself, and then inspect the [solution](./).
+After that, you can start working on the
+[second milestone](./01_extending-a-non-oop-project/README.md).
