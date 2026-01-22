@@ -26,7 +26,7 @@ In C, functions are usually bound at compile-time. If you call
 jump to. Polymorphism breaks this static link.
 
 > `\begin{unnecessary_info}`\
-> Polymorphism derived from Greek for "many shapes".
+> Polymorphism derived from Greek for "many shapes".\
 > `\end{unnecessary_info}`
 
 Polymorphism allows a single interface to represent different underlying
@@ -63,3 +63,11 @@ int *(*concate_arays)(int *arr1, int *arr2, int size1, int size2);
 The key insight: **function pointers let you treat functions as variable**. You
 can pass them around, store them in structs, and decide which one to call based
 on runtime conditions.
+
+[Here](https://www.w3schools.com/c/c_functions_pointers.php) is a quick
+reference for function pointers.
+
+---
+
+Enough introduction. Now you need to implement a dynamic dispatch logic to
+practice OOP logic - [with what you have already known](./milestone-1.md).
