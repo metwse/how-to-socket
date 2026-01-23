@@ -1,5 +1,5 @@
 # Extending a Non-OOP Project
-In exercise 00, you built a basic message relay. Now you need to extend it with
+In Exercise 00, you built a basic message relay. Now you need to extend it with
 new features. This exercise will demonstrate how difficult it becomes to
 maintain and extend code that relies on traditional if/else dispatching.
 
@@ -76,7 +76,7 @@ Your program should:
      command.
 4. Maintain compatibility with previous version:
    - Your code should still handle direct messages, group messages, and global
-     messages from exercise 00
+     messages from Exercise 00
 
 ## Hints
 - Consider using a struct to represent a buffered payload and enum for type of
@@ -94,8 +94,8 @@ The problem this reveals is that the traditional approaches make extensions
 
 <details>
   <summary>
-    Spoiler: Do not inspect the requirements for exercise 02 before completing
-    01 this if you value your mental health!
+    Spoiler: Do not inspect the requirements for Exercise 02 before completing
+    this exercise if you value your mental health!
   </summary>
 
   The agony of extending your code will be unbearable. You will eventually be
@@ -104,7 +104,7 @@ The problem this reveals is that the traditional approaches make extensions
 
   Inspect the [solution](./) for this exercise. Current design principle
   becoming increasingly unmaintainable with
-  [new requirements](../02_oh-no/README.md).
+  [new requirements](../02_refactoring-with-function-pointers/README.md).
 </details>
 
 
