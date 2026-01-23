@@ -1,13 +1,12 @@
 /**
  * @file traditional_dispatch.h
- * @brief Solution for milestone 01
+ * @brief Solution for milestone 01.
  *
  * This header demonstrates the traditional C approach to polymorphism using
  * tagged unions (discriminated unions). Each payload type is explicitly
  * enumerated and handled through switch/if-else logic, showcasing the
  * limitations of non-OOP patterns when extending functionality.
  */
-
 
 #ifndef TRADITIONAL_DISPATCH_H
 #define TRADITIONAL_DISPATCH_H
