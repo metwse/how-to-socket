@@ -1,3 +1,14 @@
+> `\begin{aside}`\
+> We called the enum-based approach "traditional dispatch" because it was the
+> familiar starting point, not because it is a standard pattern. It is actually
+> called *static dispatch*, the compiler determines which code to execute at
+> compile time based on the enum value. With function pointers, you are using
+> *dynamic dispatch*, the decision of which function to call is made at runtime
+> based on the function pointer stored in the object. Both achieve the same
+> goal (executing type-specific behavior), but dynamic dispatch provides more
+> flexibility at the cost of a small runtime overhead. \
+> `\end{aside}`
+
 # Refactoring with Function Pointers
 ## New Requirements
 1. Multiple receivers: Messages can now target multiple users/channels
@@ -163,19 +174,8 @@ We complained about switch/case being repetitive, but now that we have defined
 so many functions, is not this even more repetitive?
 
 - Is it reasonable to store a pointer for each function inside the struct?
-- What prevents conflicting behaviors (e.g., a command's `process` function but
-  a message's `destructor`)?
+- *No type-safety.* What prevents conflicting behaviors (e.g., a command's
+  `process` function but a message's `destructor`)?
 - We still had problems in the old approach...
-
-> `\begin{aside}`\
-> We called the enum-based approach "traditional dispatch" because it was the
-> familiar starting point, not because it is a standard pattern. It is actually
-> called *static dispatch*, the compiler determines which code to execute at
-> compile time based on the enum value. With function pointers, you are using
-> *dynamic dispatch*, the decision of which function to call is made at runtime
-> based on the function pointer stored in the object. Both achieve the same
-> goal (executing type-specific behavior), but dynamic dispatch provides more
-> flexibility at the cost of a small runtime overhead. \
-> `\end{aside}`
 
 **Up Next:** A detailed discussion on dynamic dispatch
