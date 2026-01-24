@@ -111,14 +111,14 @@ struct payload_buffer *new_buffer();
  * string fields in the payload are dynamically allocated.
  *
  * @param buf Pointer to the payload buffer
- * @param payload Raw payload string to parse (e.g., "/login alice pass123")
+ * @param raw Raw payload string to parse (e.g., "/login alice pass123")
  *
  * @note The payload string is parsed immediately; the original string is not
  *       stored
  * @note All dynamically allocated strings must be freed when the payload is
  *       destroyed
  */
-void push_payload(struct payload_buffer *buf, const char *payload);
+void push_payload(struct payload_buffer *buf, const char *raw);
 
 /**
  * @brief Processes and prints the next payload from the buffer.

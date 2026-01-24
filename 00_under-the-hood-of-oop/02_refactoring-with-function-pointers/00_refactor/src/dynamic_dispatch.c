@@ -22,11 +22,11 @@ struct payload_buffer *new_buffer()
 }
 
 /* extract string until the next space */
-static char *extract_token(const char *payload) {
+static char *extract_token(const char *raw) {
 	int end;
 	char *token;
 
-	for (end = 0; payload[end] != ' ' && payload[end] != '\0'; end++);
+	for (end = 0; raw[end] != ' ' && raw[end] != '\0'; end++);
 
 	if (end == 0) {
 		return NULL;
@@ -36,7 +36,7 @@ static char *extract_token(const char *payload) {
 		token[end] = '\0';
 
 		for (int i = 0; i < end; i++)
-			token[i] = payload[i];
+			token[i] = raw[i];
 
 		return token;
 	}
@@ -49,29 +49,29 @@ static char *extract_token(const char *payload) {
  * (switch/if-else). Setting up function tables dynamically is the next level
  * of abstraction, which we will introduce in upcoming exercises.
  */
-void push_payload(struct payload_buffer *buf, const char *payload)
+void push_payload(struct payload_buffer *buf, const char *raw)
 {
 	bool payload_valid = true;
-	struct payload parsed;
+	struct payload p;
 
 	// still PAIN
-	if (payload[0] == '/') {
+	if (raw[0] == '/') {
 		char command_name[7];
 
 		int i;
 
-		for (i = 0; i < 6 && payload[i + 1] != ' '; i++)
-			command_name[i] = payload[i + 1];
+		for (i = 0; i < 6 && raw[i + 1] != ' '; i++)
+			command_name[i] = raw[i + 1];
 
 		command_name[i] = '\0';
 
 		if (strcmp("login", command_name) == 0) {
 			char *username, *password;
-			assert((username = extract_token(payload + 7)));
+			assert((username = extract_token(raw + 7)));
 			assert((password = extract_token(
-				payload + strlen(username) + 8)));
+				raw + strlen(username) + 8)));
 
-			parsed = (struct payload) {
+			p = (struct payload) {
 				.process = process_command_login,
 				.destroy = destroy_command_login,
 				.data.command_login = {
@@ -81,9 +81,9 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 			};
 		} else if (strcmp("join", command_name) == 0) {
 			char *channel;
-			assert((channel = extract_token(payload + 6)));
+			assert((channel = extract_token(raw + 6)));
 
-			parsed = (struct payload) {
+			p = (struct payload) {
 				.process = process_command_join,
 				.destroy = destroy_command_join,
 				.data.command_join = {
@@ -91,7 +91,7 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 				}
 			};
 		} else if (strcmp("logout", command_name) == 0) {
-			parsed = (struct payload) {
+			p = (struct payload) {
 				.process = process_command_logout,
 				.destroy = destroy_command_logout,
 			};
@@ -101,47 +101,47 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 		}
 	} else {
 		// deduce message type by checking first character
-		switch (payload[0]) {
+		switch (raw[0]) {
 		case '@':
-			parsed.process = process_message_direct;
-			parsed.destroy = destroy_message_direct;
+			p.process = process_message_direct;
+			p.destroy = destroy_message_direct;
 			break;
 		case '#':
-			parsed.process = process_message_group;
-			parsed.destroy = destroy_message_group;
+			p.process = process_message_group;
+			p.destroy = destroy_message_group;
 			break;
 		default:
-			parsed.process = process_message_global;
-			parsed.destroy = destroy_message_global;
+			p.process = process_message_global;
+			p.destroy = destroy_message_global;
 		}
 
 		char *receiver_name = "";
 
 		// both group and direct messages have a receiver name
-		if (parsed.process != process_message_global)
-			assert((receiver_name = extract_token(payload + 1)));
+		if (p.process != process_message_global)
+			assert((receiver_name = extract_token(raw + 1)));
 
-		int content_len = strlen(payload) - strlen(receiver_name);
+		int content_len = strlen(raw) - strlen(receiver_name);
 
 		char *content = malloc(sizeof(char) * (content_len + 1));
 		assert(content);
 
 		if (receiver_name[0] != '\0')
-			strcpy(content, payload + strlen(receiver_name) + 2);
+			strcpy(content, raw + strlen(receiver_name) + 2);
 		else
-			strcpy(content, payload);
+			strcpy(content, raw);
 
-		switch (payload[0]) {
+		switch (raw[0]) {
 		case '@':
-			parsed.data.message_direct.content = content;
-			parsed.data.message_direct.username = receiver_name;
+			p.data.message_direct.content = content;
+			p.data.message_direct.username = receiver_name;
 			break;
 		case '#':
-			parsed.data.message_group.content = content;
-			parsed.data.message_group.channel = receiver_name;
+			p.data.message_group.content = content;
+			p.data.message_group.channel = receiver_name;
 			break;
 		default:
-			parsed.data.message_global.content = content;
+			p.data.message_global.content = content;
 		}
 	}
 
@@ -154,7 +154,7 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 			assert(buf->payloads);
 		}
 
-		buf->payloads[buf->len++] = parsed;
+		buf->payloads[buf->len++] = p;
 	}
 }
 
@@ -162,8 +162,8 @@ void process_next(struct payload_buffer *buf)
 {
 	assert(buf->process_base < buf->len);
 
-	struct payload *payload = &buf->payloads[buf->process_base];
-	payload->process(payload);
+	struct payload *p = &buf->payloads[buf->process_base];
+	p->process(p);
 
 	buf->process_base += 1;
 }
@@ -171,8 +171,8 @@ void process_next(struct payload_buffer *buf)
 void destroy(struct payload_buffer *buf)
 {
 	for (int i = 0; i < buf->len; i++) {
-		struct payload *payload = &buf->payloads[i];
-		payload->destroy(payload);
+		struct payload *p = &buf->payloads[i];
+		p->destroy(p);
 	}
 
 	free(buf->payloads);

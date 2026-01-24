@@ -25,13 +25,13 @@ struct payload_buffer *new_buffer();
  * acts as a constructor, which we see on upcoming milesones.
  *
  * @param buf Pointer to the payload buffer
- * @param payload Raw payload string to parse
+ * @param raw Raw payload string to parse
  *
  * @note This function assigns the correct process() and destroy() function
  *       pointers based on the payload type, eliminating the need for switch
  *       statements during processing.
  */
-void push_payload(struct payload_buffer *buf, const char *payload);
+void push_payload(struct payload_buffer *buf, const char *raw);
 
 /**
  * @brief Processes the next payload from the buffer using polymorphism.

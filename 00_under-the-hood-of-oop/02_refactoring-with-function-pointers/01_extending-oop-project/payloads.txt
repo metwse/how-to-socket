@@ -1,0 +1,6 @@
+/login alice pass123
+/join general
+@alice @bob Hello everyone!
+#general #random Check this out!
+Global message to all
+/logout

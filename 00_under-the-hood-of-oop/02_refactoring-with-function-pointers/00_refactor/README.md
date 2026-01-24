@@ -54,9 +54,9 @@ void process_next(struct payload_buffer *buf) {
 Exercise 02:
 ```c
 void process_next(struct payload_buffer *buf) {
-    struct payload *payload = &buf->payloads[buf->process_base];
+    struct payload *p = &buf->payloads[buf->process_base];
 
-    payload->process(payload);  // Dynamic dispatch!
+    p->process(p);  // Dynamic dispatch!
 
     buf->process_base++;
 }

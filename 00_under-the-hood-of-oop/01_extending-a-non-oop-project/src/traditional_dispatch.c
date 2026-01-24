@@ -21,11 +21,11 @@ struct payload_buffer *new_buffer()
 }
 
 /* extract string until the next space */
-static char *extract_token(const char *payload) {
+static char *extract_token(const char *raw) {
 	int end;
 	char *token;
 
-	for (end = 0; payload[end] != ' ' && payload[end] != '\0'; end++);
+	for (end = 0; raw[end] != ' ' && raw[end] != '\0'; end++);
 
 	if (end == 0) {
 		return NULL;
@@ -35,26 +35,26 @@ static char *extract_token(const char *payload) {
 		token[end] = '\0';
 
 		for (int i = 0; i < end; i++)
-			token[i] = payload[i];
+			token[i] = raw[i];
 
 		return token;
 	}
 }
 
 /* gigantic function parses every type of payload */
-void push_payload(struct payload_buffer *buf, const char *payload)
+void push_payload(struct payload_buffer *buf, const char *raw)
 {
 	bool payload_valid = true;
-	struct payload parsed;
+	struct payload p;
 
 	// PAIN
-	if (payload[0] == '/') {
+	if (raw[0] == '/') {
 		char command_name[7];
 
 		int i;
 
-		for (i = 0; i < 6 && payload[i + 1] != ' '; i++)
-			command_name[i] = payload[i + 1];
+		for (i = 0; i < 6 && raw[i + 1] != ' '; i++)
+			command_name[i] = raw[i + 1];
 
 		command_name[i] = '\0';
 
@@ -62,11 +62,11 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 			char *username, *password;
 			// instead of error handling, this implementation
 			// raises errors in case of extract failure
-			assert((username = extract_token(payload + 7)));
+			assert((username = extract_token(raw + 7)));
 			assert((password = extract_token(
-				payload + strlen(username) + 8)));
+				raw + strlen(username) + 8)));
 
-			parsed = (struct payload) {
+			p = (struct payload) {
 				.kind = COMMAND_LOGIN,
 				.data.command_login = {
 					.username = username,
@@ -75,16 +75,16 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 			};
 		} else if (strcmp("join", command_name) == 0) {
 			char *channel;
-			assert((channel = extract_token(payload + 6)));
+			assert((channel = extract_token(raw + 6)));
 
-			parsed = (struct payload) {
+			p = (struct payload) {
 				.kind = COMMAND_JOIN,
 				.data.command_join = {
 					.channel = channel,
 				}
 			};
 		} else if (strcmp("logout", command_name) == 0) {
-			parsed = (struct payload) {
+			p = (struct payload) {
 				.kind = COMMAND_LOGOUT
 			};
 		} else {
@@ -93,44 +93,44 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 		}
 	} else {
 		// deduce message type by checking first character
-		switch (payload[0]) {
+		switch (raw[0]) {
 		case '@':
-			parsed.kind = MESSAGE_DIRECT;
+			p.kind = MESSAGE_DIRECT;
 			break;
 		case '#':
-			parsed.kind = MESSAGE_GROUP;
+			p.kind = MESSAGE_GROUP;
 			break;
 		default:
-			parsed.kind = MESSAGE_GLOBAL;
+			p.kind = MESSAGE_GLOBAL;
 		}
 
 		char *receiver_name = "";
 
 		// both group and direct messages have a receiver name
-		if (parsed.kind != MESSAGE_GLOBAL)
-			assert((receiver_name = extract_token(payload + 1)));
+		if (p.kind != MESSAGE_GLOBAL)
+			assert((receiver_name = extract_token(raw + 1)));
 
-		int content_len = strlen(payload) - strlen(receiver_name);
+		int content_len = strlen(raw) - strlen(receiver_name);
 
 		char *content = malloc(sizeof(char) * (content_len + 1));
 		assert(content);
 
 		if (receiver_name[0] != '\0')
-			strcpy(content, payload + strlen(receiver_name) + 2);
+			strcpy(content, raw + strlen(receiver_name) + 2);
 		else
-			strcpy(content, payload);
+			strcpy(content, raw);
 
-		switch (payload[0]) {
+		switch (raw[0]) {
 		case '@':
-			parsed.data.message_direct.content = content;
-			parsed.data.message_direct.username = receiver_name;
+			p.data.message_direct.content = content;
+			p.data.message_direct.username = receiver_name;
 			break;
 		case '#':
-			parsed.data.message_group.content = content;
-			parsed.data.message_group.channel = receiver_name;
+			p.data.message_group.content = content;
+			p.data.message_group.channel = receiver_name;
 			break;
 		default:
-			parsed.data.message_global.content = content;
+			p.data.message_global.content = content;
 		}
 	}
 
@@ -144,7 +144,7 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 						// allocation has been failed.
 		}
 
-		buf->payloads[buf->len++] = parsed;
+		buf->payloads[buf->len++] = p;
 	}
 }
 
@@ -152,19 +152,19 @@ void process_next(struct payload_buffer *buf)
 {
 	assert(buf->process_base < buf->len);
 
-	struct payload payload = buf->payloads[buf->process_base];
+	struct payload p = buf->payloads[buf->process_base];
 
-	switch (payload.kind) {
+	switch (p.kind) {
 	case COMMAND_LOGIN:
 		printf("Command: login\n"
 		       "  Arguments: [username: %s, password %s]\n",
-		       payload.data.command_login.username,
-		       payload.data.command_login.password);
+		       p.data.command_login.username,
+		       p.data.command_login.password);
 		break;
 	case COMMAND_JOIN:
 		printf("Command: join\n"
 		       "  Arguments: [channel: %s]\n",
-		       payload.data.command_join.channel);
+		       p.data.command_join.channel);
 		break;
 	case COMMAND_LOGOUT:
 		printf("Command: logout\n"
@@ -172,17 +172,17 @@ void process_next(struct payload_buffer *buf)
 		break;
 	case MESSAGE_DIRECT:
 		printf("Direct message to %s: %s\n",
-		       payload.data.message_direct.username,
-		       payload.data.message_direct.content);
+		       p.data.message_direct.username,
+		       p.data.message_direct.content);
 		break;
 	case MESSAGE_GROUP:
 		printf("Group message to %s: %s\n",
-		       payload.data.message_group.channel,
-		       payload.data.message_group.content);
+		       p.data.message_group.channel,
+		       p.data.message_group.content);
 		break;
 	case MESSAGE_GLOBAL:
 		printf("Global message: %s\n",
-		       payload.data.message_global.content);
+		       p.data.message_global.content);
 		break;
 	}
 
@@ -192,28 +192,28 @@ void process_next(struct payload_buffer *buf)
 void destroy(struct payload_buffer *buf)
 {
 	for (int i = 0; i < buf->len; i++) {
-		struct payload payload = buf->payloads[i];
+		struct payload p = buf->payloads[i];
 
-		switch (payload.kind) {
+		switch (p.kind) {
 		case COMMAND_LOGIN:
-			free(payload.data.command_login.username);
-			free(payload.data.command_login.password);
+			free(p.data.command_login.username);
+			free(p.data.command_login.password);
 			break;
 		case COMMAND_JOIN:
-			free(payload.data.command_join.channel);
+			free(p.data.command_join.channel);
 			break;
 		case COMMAND_LOGOUT:
 			break;
 		case MESSAGE_DIRECT:
-			free(payload.data.message_direct.username);
-			free(payload.data.message_direct.content);
+			free(p.data.message_direct.username);
+			free(p.data.message_direct.content);
 			break;
 		case MESSAGE_GROUP:
-			free(payload.data.message_group.channel);
-			free(payload.data.message_group.content);
+			free(p.data.message_group.channel);
+			free(p.data.message_group.content);
 			break;
 		case MESSAGE_GLOBAL:
-			free(payload.data.message_global.content);
+			free(p.data.message_global.content);
 			break;
 		}
 	}
