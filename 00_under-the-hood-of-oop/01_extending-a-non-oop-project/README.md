@@ -106,5 +106,3 @@ The problem this reveals is that the traditional approaches make extensions
   becoming increasingly unmaintainable with
   [new requirements](../02_refactoring-with-function-pointers/README.md).
 </details>
-
-

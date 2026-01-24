@@ -1,11 +1,10 @@
 # Refactoring with Function Pointers
-
 ## New Requirements
 1. Multiple receivers: Messages can now target multiple users/channels
    - Example: `@alice @bob #general Hello everyone!`
    - A single message goes to alice, bob, AND the general channel
 2. Bulk commands: Execute multiple commands in one line
-   - Example: `/login user pass; join general; status`
+   - Example: `/login user pass; join general; logout`
    - Commands separated by semicolons, executed sequentially
 
 ## Stop! Before You Continue...
@@ -23,22 +22,22 @@ Think about it for a moment...
 - Processing logic would need loops for each receiver.
 - Command parsing would need string splitting on semicolons.
 
-In other words: *you would need to touch almost every function*, risking bugs
-and spending hours debugging edge cases.
+In other words: you would need to touch almost every function, risking bugs
+and spending hours debugging edge cases!
 
-*This is the moment* to ask: *"Is there a better way to organize my code?"*
+*This is the moment* to ask: "Is there a better way to organize my code?"
 
-The answer is **yes**: function pointers.
+The answer is yes: *function pointers*.
 
 ## The Current Problem
 Look at your code from Exercise 01. Notice how every time you want to add a new
-payload type, you have to modify code in multiple place*:
+payload type, you have to modify code in multiple places:
 
 1. Add a new enum value to `payload_kind`
 2. Add a new struct to the `payload_data` union
 3. Add a parsing case in `push_payload()`
 4. Add a processing case in `process_next()`
-5. Add a cleanup case (if you're properly freeing memory)
+5. Add a cleanup case (if you are properly freeing memory)
 
 This is called tight coupling. Everything is intertwined, one change ripples
 through the entire codebase.
@@ -54,8 +53,8 @@ What if we need to add:
 - **Filtering** payloads by type?
 
 With the current design, each feature requires changes in almost all functions.
-*This doesn't scale.* Real applications have dozens or hundreds of message
-types.
+*This does not scale!* Real applications have dozens or hundreds of types,
+which requires continuous maintenance and extensions.
 
 ## The Function Pointer Solution
 Instead of using switch statements everywhere, we can *store behavior with
@@ -64,7 +63,7 @@ data*, recall *function pointers*.
 ### Core Idea
 What if each payload could "know how to process itself"?
 
-```c
+```
 // Traditional approach: separate data and behavior
 switch (payload->kind) {
     case COMMAND_LOGIN:
@@ -80,18 +79,19 @@ payload->process(payload);  // Each payload knows how to process itself!
 
 ## Your Mission
 Refactor your Exercise 01 code to use *function pointers* instead of switch
-statements.
+statements, and then you will requested to implement features in "New
+Requirements" section.
 
-## Requirements
+### New Design Principle "Dynamic Dispatch"
 1. Remove the gigantic `payload_kind` enum:
    - No more type enumeration!
    - Each payload type is self-contained.
 2. Add a function pointer to each payload:
    ```c
    struct payload {
-       void (*process)(struct payload *self);
+       void (*process)(const struct payload *self);
        // ... data
-   };
+   }
    ```
 3. Each payload type sets its own processing function:
    - Login command -> uses `process_login()` function
@@ -125,14 +125,15 @@ In C++/Java/Python, this is called *polymorphism* with virtual methods. In C,
 we achieve the same thing with *function pointers*.
 
 ### Important Notes
-- We are keeping this *simple*, just a few function pointers per payload.
-- We are *not* building a full "virtual table" system yet. You will learn
-  details of that in next milestones.
+- We are keeping this simple, just a few function pointers per payload.
+- We are not building a full "virtual table" system yet. You will learn
+  details of that in upcoming milestones.
 - Focus on understanding how function pointers enable polymorphic behavior.
 - Later exercises will show more sophisticated patterns.
 
 ## Hints
-- Keep your existing `payload_data` union structure
+- Keep your existing `payload_data` union structure, simplify it by eliminating
+  duplicate logic
 - Add a `void (*process)(struct payload *self)` function pointer to
   `struct payload`
 - Create separate `process_login()`, `process_direct_message()`, etc. functions
@@ -144,15 +145,37 @@ Your code should:
 
 - Handle all the same payloads as Exercise 01.
 - Have no switch statements in `process_next()`.
-- Be *easier to extend* with new payload types.
+- Be easier to extend with new payload types.
 - Demonstrate how function pointers enable polymorphism.
 
-After completing this, you'll understand why object-oriented languages use
+After completing this, you will understand why object-oriented languages use
 virtual methods. They solve the exact same problem you just solved with
 function pointers!
 
+After completing the exercise on your own, inspect the
+[refactored](./00_refactor/) and
+[extended with new requirements](./01_extending-oop-project/) versions of
+Exercise 01.
+
 ---
 
-Up Next: After mastering simple function pointers, you will learn about more
-advanced patterns like virtual tables (vtables) that store multiple function
-pointers, enabling even richer polymorphic behavior.
+We complained about switch/case being repetitive, but now that we have defined
+so many functions, is not this even more repetitive?
+
+- Is it reasonable to store a pointer for each function inside the struct?
+- What prevents conflicting behaviors (e.g., a command's `process` function but
+  a message's `destructor`)?
+- We still had problems in the old approach...
+
+> `\begin{aside}`\
+> We called the enum-based approach "traditional dispatch" because it was the
+> familiar starting point, not because it is a standard pattern. It is actually
+> called *static dispatch*, the compiler determines which code to execute at
+> compile time based on the enum value. With function pointers, you are using
+> *dynamic dispatch*, the decision of which function to call is made at runtime
+> based on the function pointer stored in the object. Both achieve the same
+> goal (executing type-specific behavior), but dynamic dispatch provides more
+> flexibility at the cost of a small runtime overhead. \
+> `\end{aside}`
+
+**Up Next:** A detailed discussion on dynamic dispatch
