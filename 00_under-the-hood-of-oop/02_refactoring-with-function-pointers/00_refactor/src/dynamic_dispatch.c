@@ -54,7 +54,7 @@ void push_payload(struct payload_buffer *buf, const char *payload)
 	bool payload_valid = true;
 	struct payload parsed;
 
-	// stil PAIN
+	// still PAIN
 	if (payload[0] == '/') {
 		char command_name[7];
 
