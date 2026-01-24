@@ -12,14 +12,14 @@ Start your journey: [function pointers?](./00_under-the-hood-of-oop/README.md)
 provided automation scripts. These scripts allow you to work in the workspace/
 folder while keeping the repository structure organized.
 
-*Loading an Exercise* to clear the current workspace and load a specific
+*Loading an Exercise*: to clear the current workspace and load a specific
 solution:
 ```sh
 ./load-solution.sh <lang>:<index.path>
 ```
 **Example**: `./load-solution.sh c:00.02.01`
 
-*Saving Your Work* to persist your current changes in the workspace `src/`
+*Saving Your Work*: to persist your current changes in the workspace `src/`
 or `tests/` back into the exercise folders:
 ```sh
 ./save-solution.sh <index.path>
