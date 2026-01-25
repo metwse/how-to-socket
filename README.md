@@ -15,9 +15,9 @@ folder while keeping the repository structure organized.
 *Loading an Exercise*: to clear the current workspace and load a specific
 solution:
 ```sh
-./load-solution.sh <lang>:<index.path>
+./load-solution.sh <index.path>
 ```
-**Example**: `./load-solution.sh c:00.02.01`
+**Example**: `./load-solution.sh 00.02.01`
 
 *Saving Your Work*: to persist your current changes in the workspace `src/`
 or `tests/` back into the exercise folders:
