@@ -1,12 +1,11 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <lang>:<index.path> (e.g., c:00.02.01)"
+    echo "Usage: $0 <index.path> (e.g., c:00.02.01)"
     exit 1
 fi
 
-IFS=':' read -r lang code <<< "$1"
-IFS='.' read -r -a levels <<< "$code"
+IFS='.' read -r -a levels <<< "$1"
 
 target_path="."
 
@@ -20,7 +19,7 @@ for level in "${levels[@]}"; do
     target_path="$next_path"
 done
 
-template_dir="templates/$lang/"
+template_dir="template/"
 if [ ! -d "$template_dir" ]; then
     echo "Error: Template '$template_dir' does not exist."
     exit 1

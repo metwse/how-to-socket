@@ -1,10 +1,10 @@
 /**
- * @file some_utility.h
- * @brief Sample library header.
+ * @file some_c_utility.h
+ * @brief Sample C library header.
  */
 
-#ifndef SOME_UTILITY_H
-#define SOME_UTILITY_H
+#ifndef SOME_C_UTILITY_H
+#define SOME_C_UTILITY_H
 
 
 /**

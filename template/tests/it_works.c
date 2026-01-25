@@ -1,4 +1,4 @@
-#include "../src/some_utility.h"
+#include "../src/some_c_utility.h"
 
 #include <assert.h>
 #include <stdlib.h>
