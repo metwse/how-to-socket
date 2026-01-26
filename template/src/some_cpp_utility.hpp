@@ -1,10 +1,10 @@
 /**
- * @file some_cpp_utility.h
+ * @file some_cpp_utility.hpp
  * @brief Sample C++ library header.
  */
 
-#ifndef SOME_CPP_UTILITY_H
-#define SOME_CPP_UTILITY_H
+#ifndef SOME_CPP_UTILITY_HPP
+#define SOME_CPP_UTILITY_HPP
 
 
 /**

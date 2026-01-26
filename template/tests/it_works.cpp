@@ -4,8 +4,7 @@
 #include <cstdlib>
 
 
-int main()
-{
+int main() {
     assert(mult(2, 2) == 4);
     assert(mult(1, 2) == 2);
 
