@@ -310,7 +310,7 @@ Inheritance is syntactic sugar for sharing vtable entries and data. C++ did not
 invent polymorphism, it automated the plumbing.
 
 
-## Deep Dive into Pure Virtual Methods
+## Pure Virtual Methods
 In our Paload, Command, and Message examples, we used a specific syntax:
 `virtual void <method_name>() = 0;`. This is called a pure virtual method.
 
