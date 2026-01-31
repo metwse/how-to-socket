@@ -309,6 +309,9 @@ You are now familiar with how C++ automates virtual table construction. Next:
 Inheritance is syntactic sugar for sharing vtable entries and data. C++ did not
 invent polymorphism, it automated the plumbing.
 
+On next chapter, we will continue our journey with
+[references and copy management](../06_reference_and_copy_management/README.md).
+
 
 ## Pure Virtual Methods
 In our Paload, Command, and Message examples, we used a specific syntax:
